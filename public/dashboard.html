@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Owner Dashboard - Nexly</title>
+<link rel="stylesheet" href="style.css" />
+<style>
+  /* Simple dashboard style */
+  body {
+    background: #18191c;
+    color: #ddd;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding: 2rem;
+  }
+  h1 { color: #00b0f4; }
+  button {
+    background: #00b0f4;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 5px;
+    cursor: pointer;
+    color: #111;
+    font-weight: 700;
+  }
+  button:hover {
+    background: #008fc9;
+  }
+</style>
+</head>
+<body>
+
+<h1>Owner Dashboard</h1>
+<p>Welcome, Owner! Here you can manage Nexly.</p>
+
+<button id="logout-btn">Logout</button>
+
+<script>
+  // Simple logout that redirects back to main page
+  document.getElementById('logout-btn').onclick = () => {
+    window.location.href = '/';
+  };
+</script>
+
+</body>
+</html>
