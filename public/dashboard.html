@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Vervra Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app" style="flex-direction: column; align-items: center; padding: 2rem;">
+    <h1 style="font-size: 2rem;">⚙️ Vervra Admin Dashboard</h1>
+    <div style="margin-top: 2rem; text-align: center;">
+      <img id="dash-pic" src="" alt="pfp" style="width: 64px; height: 64px; border-radius: 50%;" />
+      <h2 id="dash-name" style="margin-top: 1rem;"></h2>
+      <p style="font-size: 0.9rem; color: #aaa;">Logged in as a local user</p>
+    </div>
+
+    <div style="margin-top: 2rem;">
+      <button onclick="goTo('index.html')">💬 Open Chat</button>
+      <button onclick="goTo('bible.html')">📖 Open Bible</button>
+    </div>
+  </div>
+
+  <script>
+    const name = localStorage.getItem("username") || "Anonymous";
+    const pic = localStorage.getItem("profilePic") || "https://via.placeholder.com/64";
+    document.getElementById("dash-name").textContent = name;
+    document.getElementById("dash-pic").src = pic;
+
+    function goTo(page) {
+      window.location.href = page;
+    }
+  </script>
+</body>
+</html>
+

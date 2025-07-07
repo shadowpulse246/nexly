@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login - Vervra</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      justify-content: center;
+      align-items: center;
+    }
+    .login-box {
+      background-color: #2f3136;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #0005;
+      text-align: center;
+      width: 300px;
+    }
+    .login-box input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 5px;
+      border: none;
+      background-color: #40444b;
+      color: #fff;
+    }
+    .login-box button {
+      margin-top: 15px;
+      padding: 10px 20px;
+      background-color: #5865f2;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .login-box button:hover {
+      background-color: #4752c4;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-box">
+    <h2>👋 Welcome to Vervra</h2>
+    <input type="text" id="name" placeholder="Enter your name" />
+    <input type="text" id="pic" placeholder="Paste profile picture URL" />
+    <button onclick="saveAndGo()">Enter</button>
+  </div>
+
+  <script>
+    function saveAndGo() {
+      const name = document.getElementById("name")
+    }

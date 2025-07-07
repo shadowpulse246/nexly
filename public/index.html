@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Vervra Chat</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app">
+    <aside class="sidebar">
+      <h1 class="logo">Vervra</h1>
+      <nav>
+        <ul>
+          <li data-room="general" class="active"># General</li>
+          <li data-room="blessings"># Blessings</li>
+          <li data-room="prayer"># Prayer</li>
+          <li><a href="dashboard.html">⚙️ Dashboard</a></li>
+          <li><a href="bible.html">📖 Bible</a></li>
+        </ul>
+      </nav>
+    </aside>
+
+    <main class="chat">
+      <header>
+        <div class="room-name"># General</div>
+        <div class="user-profile">
+          <img id="user-pic" src="" alt="User Pic" />
+          <span id="user-name"></span>
+        </div>
+      </header>
+
+      <section id="chat-box" class="messages"></section>
+      <div id="typing-status"></div>
+
+      <form id="chat-form">
+        <input id="chat-input" autocomplete="off" placeholder="Type a message…" />
+        <button type="submit">Send</button>
+      </form>
+    </main>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

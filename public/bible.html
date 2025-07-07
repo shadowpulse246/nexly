@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Vervra Bible</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app" style="flex-direction: column; padding: 2rem; align-items: center;">
+    <h1 style="font-size: 2rem;">📖 Bible Verse Center</h1>
+
+    <!-- Daily Verse -->
+    <section style="margin-top: 2rem; text-align: center;">
+      <h2>🗓️ Daily Verse</h2>
+      <p id="daily-verse" style="margin-top: 1rem; font-style: italic; font-size: 1.1rem;"></p>
+    </section>
+
+    <!-- Mood-Based Verse Generator -->
+    <section style="margin-top: 3rem; text-align: center;">
+      <h2>💡 Need a Verse for Your Mood?</h2>
+      <select id="mood-select" style="margin-top: 1rem; padding: 0.5rem; border-radius: 5px;">
+        <option value="">-- Select Mood --</option>
+        <option value="love">❤️ Love</option>
+        <option value="fear">😨 Fear</option>
+        <option value="hope">🌈 Hope</option>
+        <option value="strength">💪 Strength</option>
+      </select>
+      <p id="mood-verse" style="margin-top: 1rem; font-style: italic;"></p>
+    </section>
+
+    <!-- Random Verse -->
+    <section style="margin-top: 3rem; text-align: center;">
+      <h2>🔀 Random Verse</h2>
+      <button id="random-btn" style="margin-top: 1rem; padding: 0.6rem 1.2rem; border-radius: 5px;">Get Random Verse</button>
+      <p id="random-verse" style="margin-top: 1rem; font-style: italic;"></p>
+    </section>
+
+    <!-- Navigation -->
+    <div style="margin-top: 3rem;">
+      <button onclick="window.location.href='index.html'">⬅️ Back to Chat</button>
+      <button onclick="window.location.href='dashboard.html'">⚙️ Admin Dashboard</button>
+    </div>
+  </div>
+
+  <script src="bible.js"></script>
+</body>
+</html>
