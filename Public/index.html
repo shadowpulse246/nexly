@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vervra</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Login Modal -->
+  <div id="login-screen" class="centered">
+    <div class="modal-content">
+      <h2>Welcome to Vervra</h2>
+      <input id="username-input" type="text" placeholder="Enter your name" />
+      <input id="profile-pic-input" type="text" placeholder="Profile pic URL (optional)" />
+      <button id="start-chat-btn">Start Chat</button>
+    </div>
+  </div>
+
+  <!-- Admin Dashboard -->
+  <div id="admin-dashboard" class="hidden centered">
+    <div class="modal-content">
+      <h2>Admin Login</h2>
+      <input id="admin-username" type="text" placeholder="Admin username" />
+      <input id="admin-password" type="password" placeholder="Password" />
+      <button id="admin-login-btn">Login as Admin</button>
+      <p id="admin-status" class="status-message"></p>
+    </div>
+  </div>
+
+  <!-- App UI -->
+  <div id="app" class="hidden">
+    <div id="sidebar">
+      <div id="logo">VERVRA</div>
+      <div id="channels">
+        <ul id="room-list">
+          <li data-room="general" class="active"># general</li>
+          <li data-room="blessings"># blessings <span class="badge" id="blessing-count"></span></li>
+          <li data-room="prayer"># prayer</li>
+        </ul>
+      </div>
+      <div id="user-box">
+        👤 <span id="user-display">Cash</span>
+        <br /><button id="edit-profile">Edit Profile</button>
+      </div>
+    </div>
+
+    <div id="chat-main">
+      <div id="chat-header"># general</div>
+      <div id="messages"></div>
+      <div id="typing-indicator"></div>
+      <form id="message-form">
+        <input id="message-input" type="text" placeholder="Type a blessing..." autocomplete="off" />
+        <button type="submit">Send</button>
+      </form>
+    </div>
+  </div>
+
+  <audio id="notify-sound" src="notification.mp3" preload="auto"></audio>
+
+  <script defer src="/socket.io/socket.io.js"></script>
+  <script defer src="script.js"></script>
+</body>
+</html>
+<div id="bible-verse-section" class="centered">
+  <div id="bible-verse" class="verse-card"></div>
+  <button id="verse-btn">🎯 New Verse</button>
+</div>
+<script defer src="bible.js"></script>
+<script>
+  // Ensure the verse box exists before trying to display a verse
+  document.addEventListener("DOMContentLoaded", function() {
+    const verseBox = document.getElementById("bible-verse");
+    if (verseBox) {
+      displayVerse();
+    }
+  });
+</script>

@@ -1,7 +1,7 @@
 {
-  "name": "nexly",
+  "name": "vervra",
   "version": "1.0.0",
-  "description": "Nexly Chat App",
+  "description": "vervra Chat App",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
