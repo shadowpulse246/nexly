@@ -1,46 +1,119 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Vervra Chat</title>
-<link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Vervra Chat & Bible App</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div id="app">
-    <aside class="sidebar">
-      <h1 class="logo">Vervra</h1>
-      <nav>
-        <ul>
-          <li data-room="general" class="active"># General</li>
-          <li data-room="blessings"># Blessings</li>
-          <li data-room="prayer"># Prayer</li>
-          <li><a href="dashboard.html">⚙️ Dashboard</a></li>
-          <li><a href="bible.html">📖 Bible</a></li>
-        </ul>
-      </nav>
-    </aside>
 
-    <main class="chat">
-      <header>
-        <div class="room-name"># General</div>
-        <div class="user-profile">
-          <img id="user-pic" src="" alt="User Pic" />
-          <span id="user-name"></span>
-        </div>
-      </header>
+  <!-- Sidebar: Servers + Channels -->
+  <aside id="sidebar">
+    <div id="server-list">
+      <h3>Servers</h3>
+      <ul id="serversList"></ul>
+      <button id="addServerBtn" class="btn">+ Add Server</button>
+    </div>
+    <div id="channel-list">
+      <h3>Channels</h3>
+      <ul id="channelsList"></ul>
+      <button id="addChannelBtn" class="btn">+ Add Channel</button>
+    </div>
+  </aside>
 
-      <section id="chat-box" class="messages"></section>
-      <div id="typing-status"></div>
+  <!-- Main content -->
+  <div id="main-content">
+    <!-- Header -->
+    <header>
+      <div id="user-info">
+        <img id="userPic" class="profile-pic" src="default-profile.png" alt="Profile Picture" />
+        <span id="userName">Guest</span>
+        <span id="ownerBadge" class="owner-badge" style="display:none">OWNER</span>
+      </div>
+      <button id="logoutBtn">Logout</button>
+    </header>
 
-      <form id="chat-form">
-        <input id="chat-input" autocomplete="off" placeholder="Type a message…" />
-        <button type="submit">Send</button>
+    <!-- Pages -->
+
+    <!-- Chat Page -->
+    <section id="chatPage" class="page active">
+      <div id="chat-window">
+        <ul id="messages"></ul>
+        <div id="typingIndicator" class="typing-indicator"></div>
+      </div>
+      <form id="chatForm">
+        <input id="messageInput" autocomplete="off" placeholder="Type your message..." />
+        <button id="sendBtn" type="submit">Send</button>
       </form>
-    </main>
+    </section>
+
+    <!-- Bible Page -->
+    <section id="biblePage" class="page">
+      <h2>📖 Daily Bible Verse</h2>
+      <div id="dailyVerse" class="verse-box"></div>
+
+      <h3>🎲 Random Verse Generator</h3>
+      <button id="randomVerseBtn" class="btn">Generate Random Verse</button>
+      <div id="randomVerse" class="verse-box"></div>
+
+      <h3>😊 Mood-Based Verse</h3>
+      <select id="moodSelect" class="mood-select">
+        <option value="">Select Mood</option>
+        <option value="hope">Hope</option>
+        <option value="comfort">Comfort</option>
+        <option value="strength">Strength</option>
+        <option value="courage">Courage</option>
+        <option value="encouragement">Encouragement</option>
+        <option value="peace">Peace</option>
+        <option value="motivation">Motivation</option>
+      </select>
+      <button id="moodVerseBtn" class="btn">Get Verse</button>
+      <div id="moodVerse" class="verse-box"></div>
+    </section>
+
+    <!-- Premium Page -->
+    <section id="premiumPage" class="page">
+      <h2>Premium Features</h2>
+      <p>Unlock exclusive features soon! Stay tuned.</p>
+    </section>
+
+    <!-- Settings Page -->
+    <section id="settingsPage" class="page">
+      <h2>Settings</h2>
+      <form id="settingsForm">
+        <label>
+          Profile Picture URL:
+          <input type="url" id="profilePicInput" placeholder="Image URL" />
+        </label>
+        <label>
+          Display Name:
+          <input type="text" id="displayNameInput" placeholder="Your display name" />
+        </label>
+        <button type="submit" class="btn">Save Settings</button>
+      </form>
+    </section>
+
+    <!-- Admin Page (only visible to owner) -->
+    <section id="adminPage" class="page" style="display:none;">
+      <h2>Admin Dashboard</h2>
+      <p>Welcome, Owner! Manage servers and users here.</p>
+      <!-- Add more admin tools here -->
+    </section>
+
   </div>
 
+  <!-- Bottom Navigation for mobile -->
+  <nav class="bottom-nav">
+    <button data-page="chatPage" class="active">Chat</button>
+    <button data-page="biblePage">Bible</button>
+    <button data-page="premiumPage">Premium</button>
+    <button data-page="settingsPage">Settings</button>
+    <button data-page="adminPage" id="adminNavBtn" style="display:none;">Admin</button>
+  </nav>
+
   <script src="/socket.io/socket.io.js"></script>
+  <script src="bible.js"></script>
   <script src="script.js"></script>
 </body>
 </html>

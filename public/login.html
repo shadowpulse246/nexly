@@ -2,54 +2,118 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Login - Vervra</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Vervra Login</title>
   <link rel="stylesheet" href="style.css" />
   <style>
-    body {
+    /* Minimal extra styles to center login form */
+    body, html {
+      height: 100%;
+      margin: 0;
+      background-color: #2f3136;
+      display: flex;
       justify-content: center;
       align-items: center;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #ddd;
     }
-    .login-box {
-      background-color: #2f3136;
-      padding: 2rem;
+    #loginContainer {
+      background-color: #202225;
+      padding: 30px 40px;
       border-radius: 10px;
-      box-shadow: 0 0 10px #0005;
+      box-shadow: 0 0 15px #5865f2aa;
+      width: 320px;
       text-align: center;
-      width: 300px;
     }
-    .login-box input {
+    h2 {
+      margin-bottom: 20px;
+      color: #7289da;
+      font-weight: 700;
+    }
+    input[type="text"] {
       width: 100%;
-      padding: 10px;
-      margin-top: 10px;
-      border-radius: 5px;
+      padding: 10px 14px;
+      margin-bottom: 20px;
+      border-radius: 6px;
       border: none;
-      background-color: #40444b;
-      color: #fff;
+      background-color: #2f3136;
+      color: #ddd;
+      font-size: 16px;
+      outline: none;
     }
-    .login-box button {
-      margin-top: 15px;
-      padding: 10px 20px;
+    button {
+      width: 100%;
+      padding: 12px 0;
       background-color: #5865f2;
-      color: white;
       border: none;
-      border-radius: 5px;
+      border-radius: 6px;
+      color: white;
+      font-weight: 700;
       cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s ease;
     }
-    .login-box button:hover {
+    button:hover {
       background-color: #4752c4;
+    }
+    #errorMsg {
+      color: #f04747;
+      margin-top: 12px;
+      min-height: 20px;
+      font-weight: 600;
     }
   </style>
 </head>
 <body>
-  <div class="login-box">
-    <h2>👋 Welcome to Vervra</h2>
-    <input type="text" id="name" placeholder="Enter your name" />
-    <input type="text" id="pic" placeholder="Paste profile picture URL" />
-    <button onclick="saveAndGo()">Enter</button>
+  <div id="loginContainer">
+    <h2>Welcome to Vervra</h2>
+    <form id="loginForm">
+      <input
+        type="text"
+        id="usernameInput"
+        placeholder="Enter your username"
+        required
+        autocomplete="off"
+        minlength="3"
+        maxlength="20"
+        autofocus
+      />
+      <button type="submit">Login</button>
+    </form>
+    <div id="errorMsg"></div>
   </div>
 
   <script>
-    function saveAndGo() {
-      const name = document.getElementById("name")
-    }
+    const loginForm = document.getElementById("loginForm");
+    const usernameInput = document.getElementById("usernameInput");
+    const errorMsg = document.getElementById("errorMsg");
+
+    loginForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const name = usernameInput.value.trim();
+      if (name.length < 3) {
+        errorMsg.textContent = "Username must be at least 3 characters.";
+        return;
+      }
+      // Save user data to localStorage with default pic
+      const user = {
+        name,
+        pic: "default-profile.png",
+      };
+      localStorage.setItem("vervraUser", JSON.stringify(user));
+      // Redirect to main app page
+      window.location.href = "index.html";
+    });
+  </script>
+</body>
+</html>
+</html>
+<!-- This is the login page for the Vervra app. It allows users to enter their username and logs them in by saving their data to localStorage. -->
+<!-- The page includes basic styling for a clean, modern look, with a centered login form and responsive design. -->
+<!-- The script handles form submission, validates the username length, and saves the user data to localStorage before redirecting to the main app page. -->
+<!-- The default profile picture is set to "default-profile.png", which should be present in the public directory. -->
+<!-- This page is designed to be simple and user-friendly, providing a quick way for users to access the Vervra app. -->
+<!-- The login form includes basic validation to ensure the username is at least 3 characters long. -->
+<!-- If the username is valid, it saves the user data to localStorage and redirects to the main app page. -->
+<!-- If the username is invalid, it displays an error message below the form. -->
+<!-- The page uses modern CSS for styling, including hover effects on the login button and a clean

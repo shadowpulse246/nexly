@@ -7,48 +7,92 @@ const path = require("path");
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
-
 const PORT = process.env.PORT || 3000;
+
+const PUBLIC_DIR = path.join(__dirname, "public");
 const DATA_DIR = path.join(__dirname, "data");
-const ROOMS = ["general", "blessings", "prayer"];
+const USERS_FILE = path.join(DATA_DIR, "users.json");
+const SERVERS_DIR = path.join(DATA_DIR, "servers");
 
-// Ensure /data folder and files exist
 if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR);
-ROOMS.forEach(room => {
-  const file = path.join(DATA_DIR, `${room}.json`);
-  if (!fs.existsSync(file)) fs.writeFileSync(file, "[]");
+if (!fs.existsSync(SERVERS_DIR)) fs.mkdirSync(SERVERS_DIR);
+if (!fs.existsSync(USERS_FILE)) fs.writeFileSync(USERS_FILE, JSON.stringify([
+  { username: "Owner", password: "adminpass", profilePic: "", isOwner: true }
+], null, 2));
+
+// Helpers
+const loadJSON = file => JSON.parse(fs.readFileSync(file, "utf8"));
+const saveJSON = (file, data) => fs.writeFileSync(file, JSON.stringify(data, null, 2));
+
+app.use(express.static(PUBLIC_DIR));
+app.use(express.json());
+
+app.get("/", (req, res) => res.sendFile(path.join(PUBLIC_DIR, "index.html")));
+app.get("/login.html", (req, res) => res.sendFile(path.join(PUBLIC_DIR, "login.html")));
+app.get("/signup.html", (req, res) => res.sendFile(path.join(PUBLIC_DIR, "signup.html")));
+app.get("/bible.html", (req, res) => res.sendFile(path.join(PUBLIC_DIR, "bible.html")));
+app.get("/admin.html", (req, res) => res.sendFile(path.join(PUBLIC_DIR, "admin.html")));
+app.get("/premium.html", (req, res) => res.sendFile(path.join(PUBLIC_DIR, "premium.html")));
+app.get("/settings.html", (req, res) => res.sendFile(path.join(PUBLIC_DIR, "settings.html")));
+app.get("/tos.html", (req, res) => res.sendFile(path.join(PUBLIC_DIR, "tos.html")));
+app.get("/privacy.html", (req, res) => res.sendFile(path.join(PUBLIC_DIR, "privacy.html")));
+
+// Auth
+app.post("/signup", (req, res) => {
+  const { username, password, profilePic } = req.body;
+  if (!username || !password) return res.json({ success: false, message: "Username & password required" });
+  const users = loadJSON(USERS_FILE);
+  if (users.find(u => u.username.toLowerCase() === username.toLowerCase())) {
+    return res.json({ success: false, message: "Username taken" });
+  }
+  users.push({ username, password, profilePic: profilePic||"", isOwner: false });
+  saveJSON(USERS_FILE, users);
+  res.json({ success: true });
 });
 
-// Helper functions
-function getMessages(room) {
-  const file = path.join(DATA_DIR, `${room}.json`);
-  return JSON.parse(fs.readFileSync(file));
-}
-function saveMessage(room, msg) {
-  const file = path.join(DATA_DIR, `${room}.json`);
-  const messages = getMessages(room);
-  messages.push(msg);
-  fs.writeFileSync(file, JSON.stringify(messages));
-}
-
-// Serve static frontend
-app.use(express.static(path.join(__dirname, "public")));
-
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
+app.post("/login", (req, res) => {
+  const { username, password } = req.body;
+  const users = loadJSON(USERS_FILE);
+  const user = users.find(u => u.username === username && u.password === password);
+  if (!user) return res.json({ success: false, message: "Invalid credentials" });
+  res.json({ success: true, user });
 });
 
-// Socket.io chat logic
+// Servers API
+app.get("/servers", (req, res) => {
+  const servers = fs.readdirSync(SERVERS_DIR).map(id => {
+    const file = path.join(SERVERS_DIR, id, "server.json");
+    if (!fs.existsSync(file)) return null;
+    return loadJSON(file);
+  }).filter(Boolean);
+  res.json(servers);
+});
+
+app.post("/servers", (req, res) => {
+  const { name, icon, owner } = req.body;
+  if (!name || !owner) return res.json({ success: false, message: "Name and owner required" });
+  const id = name.toLowerCase().replace(/\W/g, "") + Date.now();
+  const serverPath = path.join(SERVERS_DIR, id);
+  if (!fs.existsSync(serverPath)) fs.mkdirSync(serverPath, { recursive: true });
+  saveJSON(path.join(serverPath, "server.json"), { id, name, icon, owner, created: new Date().toISOString() });
+  saveJSON(path.join(serverPath, "chat.json"), []);
+  res.json({ success: true, server: { id, name, icon, owner } });
+});
+
+// Socket.io
 io.on("connection", socket => {
-  let currentRoom = "general";
-  socket.join(currentRoom);
-  socket.emit("chat-history", getMessages(currentRoom));
+  let currentServer = null;
 
-  socket.on("join-room", (newRoom, oldRoom) => {
-    socket.leave(oldRoom);
-    socket.join(newRoom);
-    currentRoom = newRoom;
-    socket.emit("chat-history", getMessages(newRoom));
+  socket.on("join-server", serverId => {
+    if (currentServer) socket.leave(currentServer);
+    currentServer = serverId;
+    socket.join(serverId);
+    const chatFile = path.join(SERVERS_DIR, serverId, "chat.json");
+    if (fs.existsSync(chatFile)) {
+      socket.emit("chat-history", loadJSON(chatFile));
+    } else {
+      socket.emit("chat-history", []);
+    }
   });
 
   socket.on("send-chat-message", data => {
@@ -59,7 +103,11 @@ io.on("connection", socket => {
       time: new Date().toISOString(),
     };
     io.to(data.room).emit("chat-message", msg);
-    saveMessage(data.room, msg);
+    const chatFile = path.join(SERVERS_DIR, data.room, "chat.json");
+    let messages = [];
+    if (fs.existsSync(chatFile)) messages = loadJSON(chatFile);
+    messages.push(msg);
+    saveJSON(chatFile, messages);
   });
 
   socket.on("typing", data => {
@@ -71,17 +119,4 @@ io.on("connection", socket => {
   });
 });
 
-// Prevent port-in-use crash
-server.on("error", err => {
-  if (err.code === "EADDRINUSE") {
-    console.error(`❌ Port ${PORT} is already in use. Try closing other apps or change the port.`);
-    process.exit(1);
-  } else {
-    throw err;
-  }
-});
-
-// Start server
-server.listen(PORT, () => {
-  console.log(`✅ Vervra server running at http://localhost:${PORT}`);
-});
+server.listen(PORT, () => console.log(`✅ Vervra running at http://localhost:${PORT}`));

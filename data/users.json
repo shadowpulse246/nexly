@@ -1,0 +1,14 @@
+[
+  {
+    "username": "Owner",
+    "password": "adminpass",
+    "profilePic": "https://via.placeholder.com/64",
+    "isOwner": true
+  },
+  {
+    "username": "cash|owner",
+    "password": "coop!26674",
+    "profilePic": "",
+    "isOwner": false
+  }
+]
