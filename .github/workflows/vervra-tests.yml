@@ -1,0 +1,113 @@
+name: Vervra Python verification
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      PORT: 3000
+      VERVRA_DATA_DIR: ${{ runner.temp }}/vervra-data
+      VERVRA_TEST_SERVER_ID: ghaintegration$(date +%s)
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+          python -m pip install pytest requests
+
+      - name: Compile Python sources
+        run: python -m compileall app server.py tests
+
+      - name: Run unit tests
+        run: python -m pytest -q
+
+      - name: Prepare isolated integration data
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf "$VERVRA_DATA_DIR"
+          mkdir -p "$VERVRA_DATA_DIR"
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          root = Path(os.environ["VERVRA_DATA_DIR"])
+          (root / "servers").mkdir(parents=True)
+          (root / "users.json").write_text(json.dumps([{
+              "username": "Owner",
+              "password": "adminpass",
+              "profilePic": "",
+              "isOwner": True
+          }]), encoding="utf-8")
+          PY
+          echo "VERVRA_TEST_SERVER_ID=ghaintegration$(date +%s%N)" >> "$GITHUB_ENV"
+
+      - name: Start Vervra server
+        shell: bash
+        run: |
+          set -euo pipefail
+          nohup python server.py > "$RUNNER_TEMP/vervra-server.log" 2>&1 &
+          echo $! > "$RUNNER_TEMP/vervra-server.pid"
+
+      - name: Wait for localhost:3000
+        shell: bash
+        run: |
+          set -euo pipefail
+          for attempt in {1..60}; do
+            if curl --fail --silent http://127.0.0.1:3000/ >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat "$RUNNER_TEMP/vervra-server.log"
+          exit 1
+
+      - name: Run live HTTP and Socket.IO integration test
+        run: python tests/live_integration.py
+
+      - name: Restart server and verify persisted chat history
+        shell: bash
+        run: |
+          set -euo pipefail
+          kill "$(cat "$RUNNER_TEMP/vervra-server.pid")"
+          for attempt in {1..30}; do
+            if ! curl --silent http://127.0.0.1:3000/ >/dev/null 2>&1; then break; fi
+            sleep 1
+          done
+          nohup python server.py > "$RUNNER_TEMP/vervra-server-restart.log" 2>&1 &
+          echo $! > "$RUNNER_TEMP/vervra-server-restart.pid"
+          for attempt in {1..60}; do
+            if curl --fail --silent http://127.0.0.1:3000/ >/dev/null; then break; fi
+            sleep 1
+          done
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          path = Path(os.environ["VERVRA_DATA_DIR"]) / "servers" / os.environ["VERVRA_TEST_SERVER_ID"] / "chat.json"
+          messages = json.loads(path.read_text(encoding="utf-8"))
+          assert any(item.get("message") == "github-actions-vervra-message" for item in messages)
+          print("chat persistence survived server restart")
+          PY
+
+      - name: Upload logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vervra-test-logs
+          path: |
+            ${{ runner.temp }}/vervra-server.log
+            ${{ runner.temp }}/vervra-server-restart.log

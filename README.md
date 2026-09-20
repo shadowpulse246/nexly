@@ -10,7 +10,7 @@ python -m venv .venv
 source .venv/bin/activate
 # Windows
 .venv\\Scripts\\activate
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
 ```
 
 ## Run
@@ -20,3 +20,11 @@ python server.py
 ```
 
 The default address is http://localhost:3000/. Set `PORT` to override the port. Existing JavaScript frontend assets remain in `public/`; the Python backend is the production server.
+
+## Test locally
+
+```bash
+python -m pytest -q
+```
+
+GitHub Actions automatically runs the Vervra Python integration tests, including live HTTP and Socket.IO checks in an isolated temporary data directory.
